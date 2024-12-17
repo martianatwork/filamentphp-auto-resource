@@ -25,30 +25,32 @@ use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 class BaseAutoRelationManager extends AutoRelationManager
 {
     protected static array $hiddenColumns = [];
+
     protected static array $relationDictionary = [];
+
     protected static array $defaultSearchableColumns = [
-        'title', 'name', 'description'
+        'title', 'name', 'description',
     ];
 
-    public static function getRelationshipDictionary(): array {
+    public static function getRelationshipDictionary(): array
+    {
         return static::$relationDictionary;
     }
 
-    /**
-     * @return array
-     */
-    public static function getEnumDictionary(): array {
+    public static function getEnumDictionary(): array
+    {
         return static::$enumDictionary;
     }
 
-    public function getFilters(): array {
+    public function getFilters(): array
+    {
         $arr = [];
         foreach (static::getEnumDictionary() as $key => $columns) {
             $arr[] = SelectFilter::make($key)->options($columns);
         }
+
         return $arr;
     }
-
 
     public function form(Form $form): Form
     {
@@ -79,11 +81,11 @@ class BaseAutoRelationManager extends AutoRelationManager
                         ->revealable()
                         ->autocomplete(false);
                 }
-                if (in_array($name,array_keys($casts)) && in_array($casts[$name], ['bool','boolean'])) {
+                if (in_array($name, array_keys($casts)) && in_array($casts[$name], ['bool', 'boolean'])) {
                     return Checkbox::make($name)
                         ->required(false);
                 }
-                if (in_array($name,array_keys($casts)) && in_array($casts[$name], ['datetime','timestamp'])) {
+                if (in_array($name, array_keys($casts)) && in_array($casts[$name], ['datetime', 'timestamp'])) {
                     return DateTimePicker::make($name)
                         ->required($arr->isRequired());
                 }
@@ -91,11 +93,11 @@ class BaseAutoRelationManager extends AutoRelationManager
                     return DateTimePicker::make($name)
                         ->required($arr->isRequired());
                 }
-                if (in_array($name,array_keys($casts)) && in_array($casts[$name], ['date'])) {
+                if (in_array($name, array_keys($casts)) && in_array($casts[$name], ['date'])) {
                     return DatePicker::make($name)
                         ->required($arr->isRequired());
                 }
-                if (in_array($name,array_keys($casts)) && in_array($casts[$name], [TimeCast::class])) {
+                if (in_array($name, array_keys($casts)) && in_array($casts[$name], [TimeCast::class])) {
                     return TimePicker::make($name)
                         ->required($arr->isRequired());
                 }
@@ -118,7 +120,7 @@ class BaseAutoRelationManager extends AutoRelationManager
                                 $component->shouldMoveFiles() &&
                                 ($component->getDiskName() == (fn (): string => $component->disk)->call($file))
                             ) {
-                                $newPath = trim($component->getDirectory() . '/' . $component->getUploadedFileNameForStorage($file), '/');
+                                $newPath = trim($component->getDirectory().'/'.$component->getUploadedFileNameForStorage($file), '/');
 
                                 $component->getDisk()->move((fn (): string => $component->path)->call($file), $newPath);
 
@@ -132,6 +134,7 @@ class BaseAutoRelationManager extends AutoRelationManager
                                 $name,
                                 $component->getDiskName(),
                             );
+
                             return Storage::disk($component->getDiskName())->url("{$component->getDirectory()}/{$name}");
                         })
                         ->image();
@@ -152,6 +155,7 @@ class BaseAutoRelationManager extends AutoRelationManager
                         $arr->default('inr');
                     }
                 }
+
                 return $arr;
             }, $items->all())
         )
@@ -159,6 +163,7 @@ class BaseAutoRelationManager extends AutoRelationManager
             ->except(
                 array_merge(['createdAt', 'id', 'updatedAt'], static::$hiddenColumns)
             );
+
         return $form
             ->schema($items->all())
             ->columns(2);
@@ -174,31 +179,32 @@ class BaseAutoRelationManager extends AutoRelationManager
         $casts = (new ($this->getRelationship()->getModel()::class))->getCasts();
 
         $fo = collect();
-//        foreach (static::getRelationshipDictionary() as $item => $value) {
-//            $fo->add(
-//                TextColumn::make($value['relationship']['name'].'.'. $value['relationship']['title'])
-//                    ->searchable($value['searchable'] ?? false)
-//            );
-//        }
+        //        foreach (static::getRelationshipDictionary() as $item => $value) {
+        //            $fo->add(
+        //                TextColumn::make($value['relationship']['name'].'.'. $value['relationship']['title'])
+        //                    ->searchable($value['searchable'] ?? false)
+        //            );
+        //        }
         $arr = array_map(function ($ar) use ($table, &$filters, $casts) {
             $name = $ar->getName();
             $ar->table($table)->searchable(in_array($ar->getName(), static::$defaultSearchableColumns));
-            if (in_array($name,array_keys($casts)) && in_array($casts[$name], ['bool','boolean'])) {
+            if (in_array($name, array_keys($casts)) && in_array($casts[$name], ['bool', 'boolean'])) {
                 return ToggleColumn::make($name);
             }
-            if($ar->isNumeric()) {
+            if ($ar->isNumeric()) {
                 $filters[] = ValueRangeFilter::make($ar->getName())
                     ->currencyCode('INR')
                     ->currencyInSmallestUnit(false)
-                    ->currency(in_array($ar->getName(), ['amount','price']));
+                    ->currency(in_array($ar->getName(), ['amount', 'price']));
             }
-            if(in_array($ar->getName(), ['amount','price'])) {
+            if (in_array($ar->getName(), ['amount', 'price'])) {
                 $ar->money('INR');
             }
-            if(in_array($ar->getName(), array_keys(static::getRelationshipDictionary()))) {
+            if (in_array($ar->getName(), array_keys(static::getRelationshipDictionary()))) {
                 $relation = static::getRelationshipDictionary()[$ar->getName()]['relationship'];
                 $ar->name($relation['name'].'.'.$relation['title']);
             }
+
             return $ar;
         }, $table->getColumns());
         $fo = $fo->merge($arr);
@@ -206,6 +212,7 @@ class BaseAutoRelationManager extends AutoRelationManager
             array_merge(['createdAt', 'updatedAt', 'id'])
         )->all();
         $filters = array_merge($filters, static::getFilters());
+
         return $table->columns($fo)->filters($filters);
     }
 }
