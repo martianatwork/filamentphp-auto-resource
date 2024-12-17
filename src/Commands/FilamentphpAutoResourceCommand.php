@@ -1,12 +1,12 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+namespace Martianatwork\FilamentphpAutoResource\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class FilamentphpAutoResourceCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'filamentphp-auto-resource';
 
     public $description = 'My command';
 

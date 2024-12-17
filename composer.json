@@ -1,24 +1,27 @@
 {
-    "name": ":vendor_slug/:package_slug",
-    "description": ":package_description",
+    "name": "martianatwork/filamentphp-auto-resource",
+    "description": "This is my package filamentphp-auto-resource",
     "keywords": [
-        ":vendor_name",
+        "martianatwork",
         "laravel",
-        ":package_slug"
+        "filamentphp-auto-resource"
     ],
-    "homepage": "https://github.com/:vendor_slug/:package_slug",
+    "homepage": "https://github.com/martianatwork/filamentphp-auto-resource",
     "license": "MIT",
     "authors": [
         {
-            "name": ":author_name",
-            "email": "author@domain.com",
+            "name": "martianatwork",
+            "email": "bhavesh@bhaveshdeshmukh.com",
             "role": "Developer"
         }
     ],
     "require": {
-        "php": "^8.4",
+        "php": "^8.2",
+        "filament/filament": "^3.2",
+        "illuminate/contracts": "^10.0||^11.0",
+        "miguilim/filament-auto-panel": "^2.0",
         "spatie/laravel-package-tools": "^1.16",
-        "illuminate/contracts": "^10.0||^11.0"
+        "tapp/filament-value-range-filter": "^1.0"
     },
     "require-dev": {
         "laravel/pint": "^1.14",
@@ -35,13 +38,13 @@
     },
     "autoload": {
         "psr-4": {
-            "VendorName\\Skeleton\\": "src/",
-            "VendorName\\Skeleton\\Database\\Factories\\": "database/factories/"
+            "Martianatwork\\FilamentphpAutoResource\\": "src/",
+            "Martianatwork\\FilamentphpAutoResource\\Database\\Factories\\": "database/factories/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "VendorName\\Skeleton\\Tests\\": "tests/",
+            "Martianatwork\\FilamentphpAutoResource\\Tests\\": "tests/",
             "Workbench\\App\\": "workbench/app/"
         }
     },
@@ -63,10 +66,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "VendorName\\Skeleton\\SkeletonServiceProvider"
+                "Martianatwork\\FilamentphpAutoResource\\FilamentphpAutoResourceServiceProvider"
             ],
             "aliases": {
-                "Skeleton": "VendorName\\Skeleton\\Facades\\Skeleton"
+                "FilamentphpAutoResource": "Martianatwork\\FilamentphpAutoResource\\Facades\\FilamentphpAutoResource"
             }
         }
     },
