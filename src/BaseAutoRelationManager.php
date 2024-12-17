@@ -186,7 +186,7 @@ class BaseAutoRelationManager extends AutoRelationManager
             if (in_array($name,array_keys($casts)) && in_array($casts[$name], ['bool','boolean'])) {
                 return ToggleColumn::make($name);
             }
-            if($ar->isNumeric()) {
+            if(method_exists($ar, 'isNumeric') && $ar->isNumeric()) {
                 $filters[] = ValueRangeFilter::make($ar->getName())
                     ->currencyCode('INR')
                     ->currencyInSmallestUnit(false)
