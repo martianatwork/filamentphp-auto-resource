@@ -2,9 +2,9 @@
 
 namespace Martianatwork\FilamentphpAutoResource;
 
+use Martianatwork\FilamentphpAutoResource\Commands\FilamentphpAutoResourceCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Martianatwork\FilamentphpAutoResource\Commands\FilamentphpAutoResourceCommand;
 
 class FilamentphpAutoResourceServiceProvider extends PackageServiceProvider
 {
@@ -16,11 +16,10 @@ class FilamentphpAutoResourceServiceProvider extends PackageServiceProvider
          * More info: https://github.com/spatie/laravel-package-tools
          */
         $package
-            ->name('filamentphp-auto-resource')
-//            ->hasConfigFile()
-//            ->hasViews()
-//            ->hasMigration('create_filamentphp_auto_resource_table')
-//            ->hasCommand(FilamentphpAutoResourceCommand::class)
-        ;
+            ->name('filamentphp-auto-resource');
+        //            ->hasConfigFile()
+        //            ->hasViews()
+        //            ->hasMigration('create_filamentphp_auto_resource_table')
+        //            ->hasCommand(FilamentphpAutoResourceCommand::class)
     }
 }
