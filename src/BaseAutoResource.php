@@ -27,30 +27,35 @@ use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 class BaseAutoResource extends AutoResource
 {
     protected static array $hiddenColumns = [];
+
     protected static array $relationDictionary = [];
+
     protected static array $defaultSearchableColumns = [
-        'title', 'name', 'description'
+        'title', 'name', 'description',
     ];
 
-    public static function getRelationshipDictionary(): array {
+    public static function getRelationshipDictionary(): array
+    {
         return static::$relationDictionary;
     }
 
-    /**
-     * @return array
-     */
-    public static function getEnumDictionary(): array {
+    public static function getEnumDictionary(): array
+    {
         return static::$enumDictionary;
     }
-    public static function getFilters(): array {
+
+    public static function getFilters(): array
+    {
         $arr = [];
         foreach (static::$enumDictionary as $key => $columns) {
             $arr[] = SelectFilter::make($key)->options($columns);
         }
+
         return $arr;
     }
 
-    public static function form(Form $form): Form {
+    public static function form(Form $form): Form
+    {
         $fo = FormGenerator::make(
             modelClass: static::getModel(),
             overwriteColumns: static::getColumnsOverwriteMapped('form'),
@@ -71,19 +76,19 @@ class BaseAutoResource extends AutoResource
             }
             $items = $items->map(function ($arr) use ($casts) {
                 $name = $arr->getName();
-                if (in_array($name,array_keys($casts)) && in_array($casts[$name], ['bool','boolean'])) {
+                if (in_array($name, array_keys($casts)) && in_array($casts[$name], ['bool', 'boolean'])) {
                     return Toggle::make($name)
                         ->required(false);
                 }
-                if (in_array($name,array_keys($casts)) && in_array($casts[$name], ['datetime','timestamp'])) {
+                if (in_array($name, array_keys($casts)) && in_array($casts[$name], ['datetime', 'timestamp'])) {
                     return DateTimePicker::make($name)
                         ->required($arr->isRequired());
                 }
-                if (in_array($name,array_keys($casts)) && in_array($casts[$name], ['date'])) {
+                if (in_array($name, array_keys($casts)) && in_array($casts[$name], ['date'])) {
                     return DatePicker::make($name)
                         ->required($arr->isRequired());
                 }
-                if (in_array($name,array_keys($casts)) && in_array($casts[$name], [TimeCast::class])) {
+                if (in_array($name, array_keys($casts)) && in_array($casts[$name], [TimeCast::class])) {
                     return TimePicker::make($name)
                         ->required($arr->isRequired());
                 }
@@ -111,7 +116,7 @@ class BaseAutoResource extends AutoResource
                                 $component->shouldMoveFiles() &&
                                 ($component->getDiskName() == (fn (): string => $component->disk)->call($file))
                             ) {
-                                $newPath = trim($component->getDirectory() . '/' . $component->getUploadedFileNameForStorage($file), '/');
+                                $newPath = trim($component->getDirectory().'/'.$component->getUploadedFileNameForStorage($file), '/');
 
                                 $component->getDisk()->move((fn (): string => $component->path)->call($file), $newPath);
 
@@ -125,6 +130,7 @@ class BaseAutoResource extends AutoResource
                                 $name,
                                 $component->getDiskName(),
                             );
+
                             return Storage::disk($component->getDiskName())->url("{$component->getDirectory()}/{$name}");
                         })
                         ->image();
@@ -148,6 +154,7 @@ class BaseAutoResource extends AutoResource
                         $arr->default('inr');
                     }
                 }
+
                 return $arr;
             });
             $overrForm = collect(static::getColumnsOverwrite()['form']);
@@ -161,8 +168,10 @@ class BaseAutoResource extends AutoResource
                 ->except(
                     array_merge(['createdAt', 'updatedAt'], static::$hiddenColumns)
                 )->all());
+
             return $ar;
         }, $fo);
+
         return $form
             ->schema($fo)
             ->columns(2);
@@ -178,31 +187,32 @@ class BaseAutoResource extends AutoResource
         $casts = (new (static::getModel()))->getCasts();
 
         $fo = collect();
-//        foreach (static::getRelationshipDictionary() as $item => $value) {
-//            $fo->add(
-//                TextColumn::make($value['relationship']['name'].'.'. $value['relationship']['title'])
-//                    ->searchable($value['searchable'] ?? false)
-//            );
-//        }
+        //        foreach (static::getRelationshipDictionary() as $item => $value) {
+        //            $fo->add(
+        //                TextColumn::make($value['relationship']['name'].'.'. $value['relationship']['title'])
+        //                    ->searchable($value['searchable'] ?? false)
+        //            );
+        //        }
         $arr = array_map(function ($ar) use ($table, &$filters, $casts) {
             $name = $ar->getName();
             $ar->table($table)->searchable(in_array($ar->getName(), static::$defaultSearchableColumns));
-            if (in_array($name,array_keys($casts)) && in_array($casts[$name], ['bool','boolean'])) {
+            if (in_array($name, array_keys($casts)) && in_array($casts[$name], ['bool', 'boolean'])) {
                 return ToggleColumn::make($name);
             }
-            if(method_exists($ar, 'isNumeric') && $ar->isNumeric()) {
+            if (method_exists($ar, 'isNumeric') && $ar->isNumeric()) {
                 $filters[] = ValueRangeFilter::make($ar->getName())
                     ->currencyCode('INR')
                     ->currencyInSmallestUnit(false)
-                    ->currency(in_array($ar->getName(), ['amount','price']));
+                    ->currency(in_array($ar->getName(), ['amount', 'price']));
             }
-            if(in_array($ar->getName(), ['amount','price'])) {
+            if (in_array($ar->getName(), ['amount', 'price'])) {
                 $ar->money('INR');
             }
-            if(in_array($ar->getName(), array_keys(static::getRelationshipDictionary()))) {
+            if (in_array($ar->getName(), array_keys(static::getRelationshipDictionary()))) {
                 $relation = static::getRelationshipDictionary()[$ar->getName()]['relationship'];
                 $ar->name($relation['name'].'.'.$relation['title']);
             }
+
             return $ar;
         }, $table->getColumns());
         $fo = $fo->merge($arr);
@@ -216,6 +226,7 @@ class BaseAutoResource extends AutoResource
             array_merge(['createdAt', 'updatedAt', 'id'])
         )->all();
         $filters = array_merge($filters, static::getFilters());
+
         return $table->columns($fo)->filters($filters);
     }
 
@@ -231,13 +242,14 @@ class BaseAutoResource extends AutoResource
                 $items = collect($arr->getChildComponents());
                 $items = $items->map(function ($arr) {
                     $name = $arr->getName();
-                    if(in_array($name, array_keys(static::getRelationshipDictionary()))) {
+                    if (in_array($name, array_keys(static::getRelationshipDictionary()))) {
                         $relation = static::getRelationshipDictionary()[$arr->getName()]['relationship'];
                         $arr->name($relation['name'].'.'.$relation['title']);
                     }
                     if (in_array($name, ['password'])) {
                         $arr->hidden();
                     }
+
                     return $arr;
                 });
                 $overrForm = collect(static::getColumnsOverwrite()['infolist']);
@@ -251,14 +263,17 @@ class BaseAutoResource extends AutoResource
                     ->except(
                         array_merge(['createdAt', 'updatedAt'], static::$hiddenColumns)
                     )->all());
+
                 return $arr;
-//                return array_map(function ($arra) {
-//
-//                }, $arr->getChildComponents());
+                //                return array_map(function ($arra) {
+                //
+                //                }, $arr->getChildComponents());
             }, $ar->getChildComponents());
             $ar->schema($newAr);
+
             return $ar;
         }, $schema);
+
         return $infolist
             ->schema($schema)
             ->columns(3);
