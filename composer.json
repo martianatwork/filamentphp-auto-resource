@@ -21,7 +21,7 @@
         "illuminate/contracts": "^10.0||^11.0",
         "miguilim/filament-auto-panel": "^2.0",
         "spatie/laravel-package-tools": "^1.16",
-        "tapp/filament-value-range-filter": "^1.0"
+        "tapp/filament-value-range-filter": "^2.0"
     },
     "require-dev": {
         "laravel/pint": "^1.14",
